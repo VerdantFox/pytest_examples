@@ -1,5 +1,6 @@
 """example: file with example python code to pytest"""
 import logging
+import os
 import time
 
 LOGGER = logging.getLogger(__name__)
@@ -62,6 +63,14 @@ def error_function(raise_error):
     if raise_error:
         raise RuntimeError("Alas, there is an error!")
     return True
+
+
+def environment_var_function():
+    """ Some function that deals with environment variables """
+    if os.environ.get("MY_VAR") == "true":
+        return "MY_VAR is set to 'true'"
+    else:
+        return "MY_VAR is not set to 'true'"
 
 
 if __name__ == "__main__":  # pragma: no cover
