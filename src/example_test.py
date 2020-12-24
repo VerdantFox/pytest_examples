@@ -20,8 +20,8 @@ from . import example
 @pytest.mark.speed_check
 def test_basic():
     """ Test main without any changes """
-    answer = example.some_math_function(1, 2, 3)
-    assert answer == 21
+    answer = example.some_math_function(2, 1)
+    assert answer == 6
 
 
 @pytest.mark.failing
@@ -78,8 +78,8 @@ def test_faster(monkeypatch):
 
     monkeypatch.setattr(example, "GLOBAL_SLEEP_SECS", 1)
 
-    answer = example.some_math_function(1, 2, 3)
-    assert answer == 21
+    answer = example.some_math_function(2, 1)
+    assert answer == 6
 
 
 # mock a function with a lambda function
@@ -95,7 +95,7 @@ def test_mocked_functions(monkeypatch):
     monkeypatch.setattr(example.Math, "slow", lambda _: None)
     monkeypatch.setattr(example.Math, "multiply", fake_multiply)
 
-    answer = example.some_math_function(1, 2, 3)
+    answer = example.some_math_function(2, 1)
     assert answer == 2
 
 
@@ -152,8 +152,8 @@ def speedup(monkeypatch):  # Notice I pass a fixture (monkeypatch) to another fi
 
 def test_with_speedup(speedup):
     """ Use local fixture in test """
-    answer = example.some_math_function(1, 2, 3)
-    assert answer == 21
+    answer = example.some_math_function(2, 1)
+    assert answer == 6
 
 
 # --------------------------------------------------
@@ -180,8 +180,8 @@ def test_error_raising():
 @pytest.mark.output_capturing
 def test_caplog_standard(caplog):
     """ Use caplog to test logging messages (at standard WARNING level) """
-    answer = example.some_math_function(1, 2, 3)
-    assert answer == 21
+    answer = example.some_math_function(2, 1)
+    assert answer == 6
     assert "warning message!" in caplog.text
     assert "info message!" not in caplog.text
 
@@ -192,8 +192,8 @@ def test_caplog_debug(caplog, logger_to_debug):
 
     Note: "logger_to_debug" is custom fixture in conftest.py
     """
-    answer = example.some_math_function(1, 2, 3)
-    assert answer == 21
+    answer = example.some_math_function(2, 1)
+    assert answer == 6
     assert "warning message!" in caplog.text
     assert "info message!" in caplog.text
 
@@ -202,8 +202,8 @@ def test_caplog_debug(caplog, logger_to_debug):
 @pytest.mark.output_capturing
 def test_capsys(capsys):
     """ Use caplog to test print messages"""
-    answer = example.some_math_function(1, 2, 3)
-    assert answer == 21
+    answer = example.some_math_function(2, 1)
+    assert answer == 6
     captured = capsys.readouterr()  # Note this resets the internal buffer
     assert "print message" in captured.out
 
@@ -213,27 +213,27 @@ def test_capsys(capsys):
 # run the same test under a range of conditions
 # --------------------------------------------------
 PARAMS = [
-    (1, 2, 3, 21),
-    (4, 3, 2, 29),
-    pytest.param(25, 34, 11, 781, id="large"),
-    pytest.param(-5, 3, -2, 14, id="with_negatives"),
+    (2, 1, 6),
+    (7, 3, 20),
+    pytest.param(25, 5, 150, id="large"),
+    pytest.param(-5, -3, -8, id="with_negatives"),
 ]
 
 
 # Simple parametrized function with params expanded
 @pytest.mark.parametrization
-@pytest.mark.parametrize("first, second, offset, expected", PARAMS)
-def test_param_standard(speedup, first, second, offset, expected):
+@pytest.mark.parametrize("first, second, expected", PARAMS)
+def test_param_standard(speedup, first, second, expected):
     """ Test function with standard params """
-    answer = example.some_math_function(first, second, offset)
+    answer = example.some_math_function(first, second)
     assert answer == expected
 
 
-def param_func():  # sourcery skip: inline-immediately-returned-variable
+def param_func():
     """ Pretend this function did some dynamic thing to generate an iterable """
     dynamically_generated_iterable = (
-        list(range(1, 4)) + [21],
-        list(range(5, 8)) + [133],
+        list(range(3, 1, -1)) + [5],
+        list(range(6, 4, -1)) + [11],
     )
     return dynamically_generated_iterable
 
@@ -243,19 +243,17 @@ def param_func():  # sourcery skip: inline-immediately-returned-variable
 @pytest.mark.parametrize("params", param_func())
 def test_param_function(speedup, params):
     """ Test function with standard params """
-    answer = example.some_math_function(params[0], params[1], params[2])
-    assert answer == params[3]
+    answer = example.some_math_function(params[0], params[1])
+    assert answer == params[2]
 
 
 # Multiple sets of parameters in conjunction
 @pytest.mark.parametrization
-@pytest.mark.parametrize("first, second, offset, expected", PARAMS)
+@pytest.mark.parametrize("first, second, expected", PARAMS)
 @pytest.mark.parametrize("half", (True, False))
-def test_param_multiple_sets(
-    speedup, first, second, offset, expected, half
-):
+def test_param_multiple_sets(speedup, first, second, expected, half):
     """ Test 2 sets of parameters """
-    answer = example.some_math_function(first, second, offset, half=half)
+    answer = example.some_math_function(first, second, half=half)
     if half:
         assert answer == expected / 2
     else:

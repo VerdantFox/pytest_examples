@@ -11,20 +11,20 @@ DEBUG_MODE = False
 class Math:
     """ Class with simple math functions to test """
 
-    def __init__(self, offset=0):
-        self.offset = offset
+    @staticmethod
+    def add(first, second):
+        """ Add two numbers"""
+        return first + second
 
-    def add(self, first, second):
-        """ Add two numbers, with offset"""
-        return (first + second) + self.offset
+    @staticmethod
+    def divide(first, second):
+        """ Divide two numbers (excluding remainder)  """
+        return first // second
 
-    def divide(self, first, second):
-        """ Divide two numbers (excluding remainder), with offset """
-        return (first // second) + self.offset
-
-    def multiply(self, first, second):
-        """ Multiply two numbers, with offset"""
-        return first * second + self.offset
+    @staticmethod
+    def multiply(first, second):
+        """ Multiply two numbers"""
+        return first * second
 
     @staticmethod
     def slow():
@@ -33,10 +33,10 @@ class Math:
         time.sleep(GLOBAL_SLEEP_SECS)
 
 
-def some_math_function(first, second, offset, half=False):
+def some_math_function(first, second, half=False):
     """ Some function using Math """
     before = time.time()
-    math = Math(offset)
+    math = Math()
     addition = math.add(first, second)
     division = math.divide(first, second)
     math.slow()
@@ -79,4 +79,4 @@ def environment_var_function():
 
 if __name__ == "__main__":  # pragma: no cover
     # This code won't get run by tests
-    print(some_math_function(1, 2, 3, 4))
+    print(some_math_function(2, 1))
