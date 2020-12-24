@@ -1,6 +1,6 @@
 # Pytest Examples
 
-A little project to show off some of pytests useful features
+A little project to show off some of pytests useful features.
 
 ## Covered features
 

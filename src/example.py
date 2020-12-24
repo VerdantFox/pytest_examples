@@ -11,17 +11,20 @@ DEBUG_MODE = False
 class Math:
     """ Class with simple math functions to test """
 
-    def __init__(self, multiplier=1, offset=0):
-        self.multiplier = multiplier
+    def __init__(self, offset=0):
         self.offset = offset
+
+    def add(self, first, second):
+        """ Add two numbers, with offset"""
+        return (first + second) + self.offset
+
+    def divide(self, first, second):
+        """ Divide two numbers (excluding remainder), with offset """
+        return (first // second) + self.offset
 
     def multiply(self, first, second):
         """ Multiply two numbers, with offset"""
         return first * second + self.offset
-
-    def add(self, first, second):
-        """ Add two numbers, with multiplier"""
-        return (first + second) * self.multiplier
 
     @staticmethod
     def slow():
@@ -30,13 +33,14 @@ class Math:
         time.sleep(GLOBAL_SLEEP_SECS)
 
 
-def some_math_function(first, second, multiplier, offset, half=False):
+def some_math_function(first, second, offset, half=False):
     """ Some function using Math """
     before = time.time()
-    math = Math(multiplier, offset)
-    third = math.multiply(first, second)
+    math = Math(offset)
+    addition = math.add(first, second)
+    division = math.divide(first, second)
     math.slow()
-    fourth = math.add(third, second)
+    solution = math.multiply(addition, division)
     after = time.time()
     if after - before > 2:
         LOGGER.warning("warning message!")
@@ -45,9 +49,9 @@ def some_math_function(first, second, multiplier, offset, half=False):
     if DEBUG_MODE:
         LOGGER.debug("Only in debug!")
     if half:
-        fourth /= 2
+        solution /= 2
 
-    return fourth
+    return solution
 
 
 def update_file_via_pathlib(path):

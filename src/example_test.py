@@ -18,22 +18,22 @@ from . import example
 #    --lf/--last-failed (re-run only the tests that failed)
 # --------------------------------------------------
 @pytest.mark.speed_check
-def test_standard():
+def test_basic():
     """ Test main without any changes """
-    answer = example.some_math_function(1, 2, 3, 4)
-    assert answer == 24
+    answer = example.some_math_function(1, 2, 3)
+    assert answer == 21
 
 
 @pytest.mark.failing
 def test_failure():
-    """ A test designed to fail """
-    assert False
+    """ A test designed to fail, will raise ZeroDivisionError """
+    example.Math().divide(1, 0)
 
 
 # --------------------------------------------------
 # Marking tests for skip or xfail
 # --------------------------------------------------
-@pytest.mark.skip(msg="No way of testing this properly")
+@pytest.mark.skip(reason="No way of testing this properly")
 def test_skipped():
     """ Mark a test to be always skipped with a reason (marked as s or SKIPPED) """
     assert False
@@ -78,8 +78,8 @@ def test_faster(monkeypatch):
 
     monkeypatch.setattr(example, "GLOBAL_SLEEP_SECS", 1)
 
-    answer = example.some_math_function(1, 2, 3, 4)
-    assert answer == 24
+    answer = example.some_math_function(1, 2, 3)
+    assert answer == 21
 
 
 # mock a function with a lambda function
@@ -95,8 +95,8 @@ def test_mocked_functions(monkeypatch):
     monkeypatch.setattr(example.Math, "slow", lambda _: None)
     monkeypatch.setattr(example.Math, "multiply", fake_multiply)
 
-    answer = example.some_math_function(1, 2, 3, 4)
-    assert answer == 12
+    answer = example.some_math_function(1, 2, 3)
+    assert answer == 2
 
 
 # set or remove an environment variable for a test
@@ -152,8 +152,8 @@ def speedup(monkeypatch):  # Notice I pass a fixture (monkeypatch) to another fi
 
 def test_with_speedup(speedup):
     """ Use local fixture in test """
-    answer = example.some_math_function(1, 2, 3, 4)
-    assert answer == 24
+    answer = example.some_math_function(1, 2, 3)
+    assert answer == 21
 
 
 # --------------------------------------------------
@@ -180,8 +180,8 @@ def test_error_raising():
 @pytest.mark.output_capturing
 def test_caplog_standard(caplog):
     """ Use caplog to test logging messages (at standard WARNING level) """
-    answer = example.some_math_function(1, 2, 3, 4)
-    assert answer == 24
+    answer = example.some_math_function(1, 2, 3)
+    assert answer == 21
     assert "warning message!" in caplog.text
     assert "info message!" not in caplog.text
 
@@ -192,8 +192,8 @@ def test_caplog_debug(caplog, logger_to_debug):
 
     Note: "logger_to_debug" is custom fixture in conftest.py
     """
-    answer = example.some_math_function(1, 2, 3, 4)
-    assert answer == 24
+    answer = example.some_math_function(1, 2, 3)
+    assert answer == 21
     assert "warning message!" in caplog.text
     assert "info message!" in caplog.text
 
@@ -202,8 +202,8 @@ def test_caplog_debug(caplog, logger_to_debug):
 @pytest.mark.output_capturing
 def test_capsys(capsys):
     """ Use caplog to test print messages"""
-    answer = example.some_math_function(1, 2, 3, 4)
-    assert answer == 24
+    answer = example.some_math_function(1, 2, 3)
+    assert answer == 21
     captured = capsys.readouterr()  # Note this resets the internal buffer
     assert "print message" in captured.out
 
@@ -213,27 +213,27 @@ def test_capsys(capsys):
 # run the same test under a range of conditions
 # --------------------------------------------------
 PARAMS = [
-    (1, 2, 3, 4, 24),
-    (4, 3, 2, 1, 32),
-    pytest.param(25, 34, 11, 98, 10802, id="large"),
-    pytest.param(-1, 3, -2, 4, -8, id="with_negatives"),
+    (1, 2, 3, 21),
+    (4, 3, 2, 29),
+    pytest.param(25, 34, 11, 781, id="large"),
+    pytest.param(-5, 3, -2, 14, id="with_negatives"),
 ]
 
 
 # Simple parametrized function with params expanded
 @pytest.mark.parametrization
-@pytest.mark.parametrize("first, second, multiplier, offset, expected", PARAMS)
-def test_param_standard(speedup, first, second, multiplier, offset, expected):
+@pytest.mark.parametrize("first, second, offset, expected", PARAMS)
+def test_param_standard(speedup, first, second, offset, expected):
     """ Test function with standard params """
-    answer = example.some_math_function(first, second, multiplier, offset)
+    answer = example.some_math_function(first, second, offset)
     assert answer == expected
 
 
 def param_func():  # sourcery skip: inline-immediately-returned-variable
     """ Pretend this function did some dynamic thing to generate an iterable """
     dynamically_generated_iterable = (
-        list(range(1, 5)) + [24],
-        list(range(6, 10)) + [464],
+        list(range(1, 4)) + [21],
+        list(range(5, 8)) + [133],
     )
     return dynamically_generated_iterable
 
@@ -243,19 +243,19 @@ def param_func():  # sourcery skip: inline-immediately-returned-variable
 @pytest.mark.parametrize("params", param_func())
 def test_param_function(speedup, params):
     """ Test function with standard params """
-    answer = example.some_math_function(params[0], params[1], params[2], params[3])
-    assert answer == params[4]
+    answer = example.some_math_function(params[0], params[1], params[2])
+    assert answer == params[3]
 
 
 # Multiple sets of parameters in conjunction
 @pytest.mark.parametrization
-@pytest.mark.parametrize("first, second, multiplier, offset, expected", PARAMS)
+@pytest.mark.parametrize("first, second, offset, expected", PARAMS)
 @pytest.mark.parametrize("half", (True, False))
 def test_param_multiple_sets(
-    speedup, first, second, multiplier, offset, expected, half
+    speedup, first, second, offset, expected, half
 ):
     """ Test 2 sets of parameters """
-    answer = example.some_math_function(first, second, multiplier, offset, half=half)
+    answer = example.some_math_function(first, second, offset, half=half)
     if half:
         assert answer == expected / 2
     else:
