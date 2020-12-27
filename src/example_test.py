@@ -11,7 +11,7 @@ from . import example
 # --------------------------------------------------
 # Command args:
 #    -s (show std_out even if test passes)
-#    -k GLOB_NAME (run test with GLOB_NAME in name)
+#    -k STRING (run test with STRING in name)
 #    -m MARKER (run tests containing a marker)
 #    -v (verbose output -- show each test's name)
 #    --tb=LENGTH (adjust length of traceback messages)
@@ -136,7 +136,7 @@ def test_update_file_pathlib(tmp_path):
 # Fixtures
 # --------------------------------------------------
 # monkeypatch and tmp_path are fixtures
-#   buy you can create your own fixtures
+#   but you can create your own fixtures
 #
 # Fixtures can do something, return (or yield) information
 #    and then perform more actions after yield
