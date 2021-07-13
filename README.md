@@ -1,6 +1,8 @@
 # Pytest Examples
 
 A little project to show off some of pytests useful features.
+We talk about these features in this blog article:
+https://verdantfox.com/blog/view/9-pytest-tips-and-tricks-to-take-your-tests-to-the-next-level
 
 ## Covered features
 
