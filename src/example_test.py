@@ -1,4 +1,5 @@
 """ example_test: pytest examples using example.py """
+import logging
 import importlib.resources
 import os
 import random
@@ -187,11 +188,9 @@ def test_caplog_standard(caplog):
 
 
 @pytest.mark.output_capturing
-def test_caplog_debug(caplog, logger_to_debug):
-    """Use caplog to test logging messages (at debug level)
-
-    Note: "logger_to_debug" is custom fixture in conftest.py
-    """
+def test_caplog_debug(caplog):
+    """ Use caplog to test logging messages (at debug level) """
+    caplog.set_level(logging.DEBUG)
     answer = example.some_math_function(2, 1)
     assert answer == 6
     assert "warning message!" in caplog.text
